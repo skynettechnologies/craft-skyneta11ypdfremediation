@@ -2,7 +2,7 @@
   "name": "skynettechnologies/craft-skyneta11ypdfremediation",
   "description": "AI-powered PDF accessibility remediation - upload PDFs, scan website PDFs, and download remediated files.",
   "type": "craft-plugin",
-  "keywords": [""],
+  "keywords": ["accessibility","PDF", "AI-powered", "remediation", "scan", "craft-plugin"],
   "license": "MIT",
   "authors": [
     {
