@@ -1,0 +1,2099 @@
+/*
+ * SkynetA11y PDF Remediation module styles.
+ *
+ * NOTE ON UNITS: every length here is in px, deliberately. Some host admin
+ * themes set a reduced root font size — `html { font-size: 62.5% }`, so that
+ * 1rem reads as 10px — and a stylesheet written in rem then renders at 62.5% of
+ * its intended size inside them. The filter selects are the obvious casualty,
+ * ending up with 10px text and half the padding of the inputs beside them.
+ * Keep new rules in px for the same reason.
+ *
+ * Ported from AI-PDF-Remediation/frontend/src/styles/global.css and scoped
+ * under `.aiopdf-app` (see src/PdfRemediation/index.tsx). Keep it scoped: the
+ * dashboard loads Bootstrap globally and shares class names such as .btn,
+ * .card, .modal, .pagination and .table-responsive with this module.
+ */
+/* ============ Design tokens ============ */
+.aiopdf-app {
+  --font: 'Rubik', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  --primary: #420083;
+  --primary-dark: #33006a;
+  --accent: #5c17a8;
+  --accent-soft: #ece1f7;
+  --accent-softer: #f5eefc;
+  --gradient-cta: linear-gradient(94deg, #6a1fb8 0%, #420083 100%);
+
+  --success: #16a34a;
+  --success-bg: #e7f7ee;
+  --warning: #ea580c;
+  --warning-bg: #fdeee2;
+  --danger: #e11d48;
+  --danger-soft: #fdeef1;
+
+  --text: #1c0a36;
+  --text-soft: #000;
+  --text-muted: #7d7391;
+
+  --bg: #f5f3f9;
+  --surface: #ffffff;
+  --surface-alt: #f9f7fc;
+  --border: #ebe4f2;
+  --border-strong: #d9cfe8;
+
+  --sidebar-grad: linear-gradient(200deg, #ffffff 0%, #f6eefb 55%, #d4a1ea 100%);
+  --panel-grad: linear-gradient(160deg, #5e45dc 0%, #4b2fd6 50%, #4329c2 100%);
+
+  --radius: 12px;
+  --radius-lg: 18px;
+  --shadow: 0 6px 24px rgba(66, 0, 131, 0.10);
+  --shadow-soft: 0 2px 10px rgba(66, 0, 131, 0.07);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+
+  --purple-900: #241454;
+  --purple-800: #2c1a72;
+  --purple-700: #3a219a;
+  --purple-600: #4b2fd6;
+  --purple-500: #5b3ff0;
+  --purple-400: #7c5cf5;
+  --purple-300: #b39cff;
+  --purple-200: #d4c5ff;
+  --purple-100: #ede9fe;
+  --purple-50: #f5f3ff;
+  --orange-700: #b45309;
+  --orange-600: #d97706;
+  --orange-500: #F97316;
+  --orange-300: #FDBA74;
+  --orange-200: #fed7aa;
+  --orange-100: #ffedd5;
+  --orange-50: #fff7ed;
+  --bs-form-select-bg-img: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.aiopdf-app[data-theme='dark'] {
+  --primary: #a06bff;
+  --primary-dark: #8a52f5;
+  --accent: #b98cff;
+  --accent-soft: #2d2050;
+  --accent-softer: #221a3d;
+
+  --success: #34d399;
+  --success-bg: #10331f;
+  --warning: #fb923c;
+  --warning-bg: #3a2410;
+  --danger: #fb7185;
+  --danger-soft: #3d1b24;
+
+  --text: #eceafd;
+  --text-soft: #b9b6d4;
+  --text-muted: #8d8aa8;
+
+  --bg: #131022;
+  --surface: #1c1832;
+  --surface-alt: #221d3d;
+  --border: #322c52;
+  --border-strong: #453e6b;
+
+  --sidebar-grad: linear-gradient(200deg, #1c1832 0%, #251c3f 55%, #2c1f47 100%);
+  --shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* ============ Base ============ */
+.aiopdf-app, .aiopdf-app * { box-sizing: border-box; }
+.aiopdf-app { min-height: 100vh; }
+.aiopdf-app {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Embedded in the dashboard ----
+   Screens rendered inside the dashboard's chrome (EmbeddedPage) wrap only
+   their content in `.aiopdf-app`, so it must not behave like a page: no
+   full-viewport height and no background of its own, or it paints over the
+   dashboard's layout. The standalone sign-in screens keep the rules above. */
+.aiopdf-app.aiopdf-embedded {
+  min-height: 0;
+  background: transparent;
+  color: inherit;
+}
+
+/* The purchase steps ran down the standalone build's left sidebar; inside the
+   dashboard that space is the dashboard's navigation, so they run across the
+   top of the content instead. */
+.aiopdf-app .stepper.onb-stepper-inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px 32px;
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+.aiopdf-app .stepper.onb-stepper-inline .step { padding-bottom: 0; align-items: center; }
+.aiopdf-app .stepper.onb-stepper-inline .step::before { display: none; }
+.aiopdf-app .stepper.onb-stepper-inline .step-label { padding-top: 0; }
+.aiopdf-app .stepper.onb-stepper-inline .step-sub { display: block; }
+
+/* `.onb-main` supplied the page padding and surface in the standalone build;
+   the dashboard's content area already provides both. */
+.aiopdf-app .onb-main-embedded { padding: 0; background: transparent; }
+
+/* ============================================================================
+   Isolation from the dashboard's global CSS
+
+   This stylesheet was authored standalone, against plain browser defaults. In
+   the dashboard it also inherits Bootstrap (reboot + components) and the
+   dashboard's own SCSS, which share element and class names with this module
+   (.btn, .modal, .toast, .pagination, h1…h6, ul, label, main#main). Every rule
+   here restores the browser default the module's own rules were written on top
+   of. They stay at low specificity, so each module rule further down still
+   wins for the properties it declares.
+
+   If a page ever renders differently from the standalone app, look for a new
+   leak here first: in DevTools, inspect the element and check which non
+   `.aiopdf-app` rule is winning.
+   ========================================================================= */
+
+/* -- Bootstrap Reboot / type -- */
+.aiopdf-app { line-height: normal; }
+.aiopdf-app h1,
+.aiopdf-app h2,
+.aiopdf-app h3,
+.aiopdf-app h4,
+.aiopdf-app h5,
+.aiopdf-app h6 { line-height: normal; font-weight: bold; color: inherit; }
+.aiopdf-app h1 { font-size: 2em; margin: 0.67em 0; }
+.aiopdf-app h2 { font-size: 1.5em; margin: 0.83em 0; }
+.aiopdf-app h3 { font-size: 1.17em; margin: 1em 0; }
+.aiopdf-app h4 { font-size: 1em; margin: 1.33em 0; }
+.aiopdf-app h5 { font-size: 0.83em; margin: 1.67em 0; }
+.aiopdf-app h6 { font-size: 0.67em; margin: 2.33em 0; }
+.aiopdf-app p { margin: 1em 0; }
+.aiopdf-app ul,
+.aiopdf-app ol { margin: 1em 0; padding-left: 40px; }
+.aiopdf-app label { display: inline; }
+.aiopdf-app table { border-collapse: separate; border-spacing: 2px; }
+.aiopdf-app img,
+.aiopdf-app svg { vertical-align: baseline; transition: none; }
+.aiopdf-app img { width: auto; height: auto; max-width: none; }
+/* Reboot forces `font: inherit` and `margin: 0` on form controls; revert to the
+   UA values so unstyled controls (checkboxes especially) keep the size and
+   spacing they have in the standalone app. */
+.aiopdf-app button,
+.aiopdf-app input,
+.aiopdf-app select,
+.aiopdf-app textarea { font: revert; margin: revert; }
+.aiopdf-app main#main { height: auto; }
+
+/* -- Bootstrap components whose class names this module reuses -- */
+.aiopdf-app .btn {
+  line-height: normal;
+  letter-spacing: normal;
+  vertical-align: baseline;
+  user-select: auto;
+}
+.aiopdf-app .modal {
+  position: static;
+  top: auto;
+  left: auto;
+  z-index: auto;
+  display: block;
+  height: auto;
+  overflow: visible;
+  outline: none;
+}
+.aiopdf-app .modal-backdrop { width: auto; height: auto; }
+.aiopdf-app .toast {
+  display: block;
+  width: auto;
+  background-clip: border-box;
+  border: none;
+}
+.aiopdf-app .page-link {
+  display: inline-block;
+  padding: 0;
+  font-size: medium;
+  transition: none;
+}
+.aiopdf-app a { color: var(--accent); text-decoration: none; }
+.aiopdf-app a:hover { text-decoration: underline; }
+.aiopdf-app h1,
+.aiopdf-app h2,
+.aiopdf-app h3,
+.aiopdf-app h4 { margin: 0; font-weight: 800; }
+.aiopdf-app button { font-family: var(--font); cursor: pointer; }
+.aiopdf-app input,
+.aiopdf-app select,
+.aiopdf-app textarea { font-family: var(--font); color: var(--text); }
+
+/* ============ Buttons ============ */
+.aiopdf-app .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 800;
+  font-size: 16px;
+  padding: 13px 26px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s;
+}
+.aiopdf-app .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.aiopdf-app .btn:not(:disabled):hover { transform: translateY(-1px); }
+
+.aiopdf-app .btn-primary { background: var(--purple-600); color: #fff; }
+.aiopdf-app .btn-primary:not(:disabled):hover { background: var(--purple-500); }
+
+.aiopdf-app .btn-gradient { background: var(--gradient-cta); color: #fff; box-shadow: 0 8px 20px rgba(66, 0, 131, 0.32); }
+
+.aiopdf-app .btn-outline {
+  background: var(--surface);
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+}
+.aiopdf-app .btn-soft { background: var(--accent-soft); color: var(--accent); }
+.aiopdf-app .btn-ghost { background: transparent; color: var(--accent); }
+
+.aiopdf-app .btn-block { width: 100%; }
+.aiopdf-app .btn-sm { padding: 8px 16px; font-size: 14px; border-radius: 10px; }
+
+.aiopdf-app .link-danger {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: none; border: none; color: var(--danger); font-weight: 700; font-size: 17px;
+}
+.aiopdf-app .link-danger:hover { text-decoration: underline; }
+.aiopdf-app .link-danger:disabled {
+    opacity: 0.7;
+    visibility: visible;
+    cursor: not-allowed;
+    pointer-events: auto;
+    text-decoration: none;
+}
+
+/* ============ Forms ============ */
+.aiopdf-app .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 18px; }
+.aiopdf-app .field label { font-weight: 800; font-size: 15px; color: var(--text); }
+.aiopdf-app .field label .req { color: var(--danger); margin-left: 2px; }
+.aiopdf-app .field label .opt { color: var(--text-muted); font-weight: 600; }
+.aiopdf-app .input,
+.aiopdf-app .select {
+  width: 100%;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 13px 15px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.aiopdf-app .input::placeholder { color: var(--text-muted); }
+.aiopdf-app[data-theme='dark'] .input::placeholder { color: var(--text-muted); }
+.aiopdf-app .input:focus,
+.aiopdf-app .select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(66, 0, 131, 0.18);
+}
+.aiopdf-app .select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: calc(100% - 20px) 55%, calc(100% - 14px) 55%; background-size: 6px 6px; background-repeat: no-repeat; padding-right: 38px; }
+.aiopdf-app .select-arrow {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  padding-right: 40px;
+  background-image: var(--bs-form-select-bg-img) !important;
+  background-repeat: no-repeat !important;
+  background-position: right 16px center !important;
+  background-size: 16px 12px !important;
+}
+
+.aiopdf-app .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.aiopdf-app .aiocheckbox-row { display: flex; align-items: flex-start; gap: 10px; font-size: 14.5px; color: var(--text-soft); margin: 6px 0 18px; }
+.aiopdf-app .aiocheckbox-row input { width: 18px; height: 18px; accent-color: var(--purple-600); margin-top: 1px; flex-shrink: 0; }
+.aiopdf-app .aiocheckbox-row a { font-weight: 700; text-decoration: underline; color: var(--text); }
+
+.aiopdf-app .form-error {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+/* ============ Auth (design 01) ============ */
+.aiopdf-app .auth-layout { display: grid; grid-template-columns: minmax(460px, 48%) 1fr; min-height: 100vh; background: var(--surface); }
+.aiopdf-app .auth-form-col { padding: 28px 48px 40px; overflow-y: auto; }
+.aiopdf-app .auth-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 26px; }
+.aiopdf-app .auth-title { text-align: center; font-size: 36px; margin-bottom: 6px; }
+.aiopdf-app .auth-subtitle { text-align: center; font-size: 19px; color: var(--text-soft); font-weight: 600; margin: 0 0 30px; }
+.aiopdf-app .auth-alt { text-align: center; margin-top: 16px; font-size: 15px; color: var(--text-soft); }
+.aiopdf-app .auth-alt a { font-weight: 800; text-decoration: underline; }
+.aiopdf-app .login-link{ align-items: center; display: flex; flex-direction: column; justify-content: center; margin-top: 16px; }
+.aiopdf-app .forgot-password-link{ font-size: 14px; text-decoration: none; }
+
+.aiopdf-app .PhoneInput {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  position: relative;
+}
+
+.aiopdf-app .PhoneInputCountry {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.aiopdf-app .country-dropdown-wrapper {
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.aiopdf-app .country-dropdown-selected {
+  width: 100%;
+  height: 46px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--ada-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.aiopdf-app .country-dropdown-selected:hover {
+  border-color: var(--border);
+}
+
+.aiopdf-app .country-dropdown-arrow {
+  font-size: 12px;
+}
+
+.aiopdf-app .country-dropdown-list {
+  position: absolute;
+  top: calc(100%);
+  left: 0;
+  width: 100%;
+  max-height: 175px;
+  overflow-y: auto;
+  background: var(--ada-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  background-color: var(--surface);
+}
+
+.aiopdf-app .country-dropdown-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.aiopdf-app .country-dropdown-option:hover {
+  background: var(--accent-soft);
+}
+
+.aiopdf-app .country-name {
+  flex: 1;
+}
+
+.aiopdf-app .country-dial-code {
+  margin-left: 15px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.aiopdf-app .PhoneInputInput {
+  flex: 1;
+  width: 100%;
+  height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 0 6px 6px 0;
+  background: var(--ada-surface);
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.aiopdf-app .PhoneInputInput::placeholder {
+  color: var(--text-muted);
+}
+
+.aiopdf-app .PhoneInputInput:hover {
+  border-color: var(--border);
+}
+
+.aiopdf-app .PhoneInputInput:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(66, 0, 131, 0.18);
+}
+
+.aiopdf-app .PhoneInput:focus-within .country-dropdown-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(66, 0, 131, 0.18);
+}
+
+.aiopdf-app .country-dropdown-selected:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(66, 0, 131, 0.18);
+}
+
+@media (max-width: 480px) {
+  .aiopdf-app .country-dropdown {
+    min-width: 85px;
+    padding-left: 8px;
+    padding-right: 28px;
+  }
+
+  .aiopdf-app .PhoneInputInput {
+    padding: 0 10px;
+  }
+}
+
+.aiopdf-app .dashboard-login-link {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.aiopdf-app .free-trial-link {
+  font-size: 20px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.aiopdf-app .forgot-form {
+  margin-top: 16px;
+}
+
+.aiopdf-app .auth-title.forgot-page {
+  margin-bottom: 32px;
+}
+
+.aiopdf-app .auth-panel {
+  position: relative;
+  overflow: hidden;
+  background: var(--panel-grad);
+  margin: 10px;
+  border-radius: 20px;
+  padding: 40px 44px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  font-family: inherit;
+}
+
+.aiopdf-app .auth-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.35) 1px, transparent 1.5px) 24px 24px / 20px 20px,
+    radial-gradient(650px 380px at 105% 105%, rgba(255, 255, 255, 0.16), transparent 70%);
+  background-repeat: repeat, no-repeat;
+  mask-image:
+    radial-gradient(220px 160px at 0% 0%, #000 0%, transparent 100%),
+    linear-gradient(#000, #000);
+  -webkit-mask-image:
+    radial-gradient(220px 160px at 0% 0%, #000 0%, transparent 100%),
+    linear-gradient(#000, #000);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aiopdf-app .auth-panel::after {
+  content: '';
+  position: absolute;
+  top: 42%;
+  left: -70px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.03) 60%, transparent 75%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aiopdf-app .auth-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.aiopdf-app .dot-grid {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  width: 200px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 1px, transparent 1.5px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  z-index: 0;
+}
+.aiopdf-app .fixes-card {
+  background: #fff;
+  color: var(--text);
+  border-radius: 16px;
+  padding: 8px 22px;
+  max-width: 470px;
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: 0 18px 40px rgba(30, 10, 80, 0.35);
+}
+.aiopdf-app .fix-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #efeef6; }
+.aiopdf-app .fix-row:last-of-type { border-bottom: none; }
+.aiopdf-app .fix-icon {
+  width: 40px; height: 40px; border-radius: 11px;
+  background: var(--purple-100);
+  color: var(--purple-600); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.aiopdf-app .fix-label { flex: 1; font-size: 15.5px; font-weight: 700; color: #26214a; }
+.aiopdf-app .fix-status { color: #16a34a; font-weight: 800; font-size: 15px; display: flex; gap: 6px; align-items: center; }
+.aiopdf-app .fixes-footer { display: flex; justify-content: space-between; padding: 14px 0; border-top: 1px solid #efeef6; font-size: 15px; }
+.aiopdf-app .fixes-footer b { font-size: 16px; font-weight: 800; }
+
+.aiopdf-app .panel-h2 { text-align: center; font-size: 28px; margin: 6px 0 0; }
+.aiopdf-app .watch-demo {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; color: var(--text); border: none; border-radius: 999px;
+  font-size: 16.5px; font-weight: 800; padding: 14px 30px; cursor: pointer;
+}
+.aiopdf-app .pricing-title { text-align: center; font-size: 24px; }
+.aiopdf-app .pricing-title::before,
+.aiopdf-app .pricing-title::after {
+  content: ''; display: inline-block; width: 44px; height: 2px; background: rgba(255, 255, 255, 0.5);
+  vertical-align: middle; margin: 0 14px;
+}
+.aiopdf-app .price-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.aiopdf-app .price-card {
+  background: #fff; color: var(--text); border-radius: 14px; padding: 18px 10px;
+  text-align: center; box-shadow: 0 10px 26px rgba(30, 10, 80, 0.25);
+}
+.aiopdf-app .price-chip {
+  display: inline-block; background: var(--purple-100); color: var(--purple-600); border-radius: 999px;
+  font-size: 13.5px; font-weight: 800; padding: 5px 14px; margin-bottom: 10px;
+}
+.aiopdf-app .price-pages { font-size: 15px; font-weight: 700; color: #26214a; border-bottom: 1px solid #eceef4; padding-bottom: 10px; margin-bottom: 10px; }
+.aiopdf-app .price-old { color: #e11d48; text-decoration: line-through; font-weight: 700; font-size: 14px; margin-right: 6px; }
+.aiopdf-app .price-now { font-size: 22px; font-weight: 900; color: #22073f; }
+.aiopdf-app .price-per { color: #16a34a; font-weight: 700; font-size: 13.5px; margin-top: 6px; }
+.aiopdf-app .trial-note {
+  width: 100%;
+  border: 1.5px dashed rgba(255, 255, 255, 0.55);
+  border-radius: 14px;
+  padding: 16px 24px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+/* ============ Onboarding layout (designs 02-08) ============ */
+.aiopdf-app .onb-layout { display: grid; grid-template-columns: 340px 1fr; min-height: 100vh; background: var(--surface); }
+.aiopdf-app .onb-sidebar { background: var(--sidebar-grad); padding: 26px 28px; border-right: 1px solid var(--border); }
+.aiopdf-app .onb-main { padding: 30px 48px 48px; background: var(--surface-alt); }
+.aiopdf-app .onb-back {
+  display: inline-flex; align-items: center; gap: 8px; background: none; border: none;
+  color: var(--accent); font-size: 16.5px; font-weight: 800; padding: 0; margin-bottom: 8px;
+}
+.aiopdf-app .onb-title { text-align: center; font-size: 32px; margin-bottom: 26px; }
+
+.aiopdf-app .stepper { margin-top: 38px; display: flex; flex-direction: column; }
+.aiopdf-app .step { display: flex; gap: 16px; position: relative; padding-bottom: 55px; }
+.aiopdf-app .step:last-child { padding-bottom: 0; }
+.aiopdf-app .step::before {
+  content: ''; position: absolute; left: 15px; top: 30px; bottom: 0px; width: 2px; background: #cfc7e8;
+}
+.aiopdf-app .step:last-child::before { display: none; }
+.aiopdf-app .step-dot {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface); border: 2px solid #cfc7e8;
+}
+.aiopdf-app .step.done .step-dot { background: #16a34a; border-color: #16a34a; color: #fff; }
+.aiopdf-app .step.active .step-dot { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 0 5px rgba(66, 0, 131, 0.18); }
+.aiopdf-app .step.active .step-dot::after { content: ''; width: 12px; height: 12px; border-radius: 50%; background: #fff0; }
+.aiopdf-app .step-label { font-size: 17px; font-weight: 800; padding-top: 4px; color: var(--text-soft); }
+.aiopdf-app .step.done .step-label { color: #16a34a; }
+.aiopdf-app .step.active .step-label { color: var(--primary); }
+.aiopdf-app .step-sub { display: block; font-size: 15.5px; font-weight: 600; color: var(--text-muted); margin-top: 10px; }
+
+/* Plan select (design 02) */
+.aiopdf-app .plan-option {
+  display: flex; align-items: center; gap: 20px;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 22px 26px; margin-bottom: 18px;
+  cursor: pointer; transition: border-color 0.12s, box-shadow 0.12s;
+}
+.aiopdf-app .plan-option:hover { border-color: var(--accent); }
+.aiopdf-app .plan-option.selected { border: 2px solid var(--purple-500); box-shadow: var(--shadow-soft); }
+.aiopdf-app .plan-radio {
+  width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border-strong);
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+}
+.aiopdf-app .plan-option.selected .plan-radio { border-color: var(--primary); }
+.aiopdf-app .plan-option.selected .plan-radio::after { content: ''; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); }
+.aiopdf-app .plan-info { flex: 1; }
+.aiopdf-app .plan-name { color: var(--accent); font-size: 23px; font-weight: 800; }
+.aiopdf-app .plan-desc { color: var(--text-soft); font-size: 15.5px; margin-top: 5px; font-weight: 600; }
+.aiopdf-app .plan-price { text-align: right; }
+.aiopdf-app .plan-price .old { color: var(--danger); text-decoration: line-through; font-weight: 700; font-size: 20px; margin-right: 8px; }
+.aiopdf-app .plan-price .now { font-size: 26px; font-weight: 900; }
+.aiopdf-app .plan-price .per { display: block; color: var(--success); font-weight: 700; font-size: 15px; margin-top: 4px; }
+.aiopdf-app .plan-footnote { text-align: center; color: var(--text-soft); font-size: 15px; line-height: 1.7; margin: 10px 0 24px; }
+.aiopdf-app .onb-actions { display: flex; justify-content: center; }
+
+/* Payment (design 03) */
+.aiopdf-app .pay-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 22px; box-shadow: var(--shadow-soft); }
+.aiopdf-app .pay-card-head { padding: 18px 26px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.aiopdf-app .pay-card-head h3 { color: var(--accent); font-size: 19px; }
+.aiopdf-app .pay-card-body { padding: 22px 26px; }
+.aiopdf-app .order-line { display: flex; justify-content: space-between; align-items: flex-start; }
+.aiopdf-app .order-line .plan { font-size: 19px; font-weight: 800; }
+.aiopdf-app .order-line .meta { color: var(--text-soft); font-size: 15px; margin-top: 5px; line-height: 1.6; font-weight: 600; }
+.aiopdf-app .order-line .amount { font-size: 22px; font-weight: 900; }
+.aiopdf-app .card-badges { display: flex; gap: 6px; }
+.aiopdf-app .card-badge { border: 1px solid var(--border-strong); border-radius: 6px; font-size: 11px; font-weight: 900; padding: 4px 8px; color: var(--text-soft); letter-spacing: 0.03em; }
+.aiopdf-app .card-type-row { display: flex; gap: 14px; margin-bottom: 20px; }
+.aiopdf-app .card-details { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 20px }
+.aiopdf-app .card-tile {
+  width: 120px; height: 62px; border-radius: 10px; border: 2px solid transparent;
+  background: linear-gradient(135deg, #23202e, #3a3547); color: #fff;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 8px 10px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.06em;
+  cursor: pointer; position: relative;
+}
+.aiopdf-app .card-tile .chip { width: 22px; height: 15px; border-radius: 3px; background: linear-gradient(135deg, #f0b429, #d98e04); align-self: flex-end; }
+.aiopdf-app .card-tile .dots { font-size: 9px; letter-spacing: 2px; opacity: 0.8; }
+.aiopdf-app .card-tile.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(66, 0, 131, 0.28); }
+.aiopdf-app .pci-row { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--text-soft); font-size: 14px; margin-top: 16px; font-weight: 600; }
+.aiopdf-app .stripe-card-input { padding: 15px; cursor: text; }
+.aiopdf-app .stripe-card-input .StripeElement { width: 100%; }
+.aiopdf-app .saved-cards { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.aiopdf-app .saved-card {
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+  border: 1.5px solid var(--border-strong); border-radius: 10px; padding: 11px 14px;
+  font-size: 14.5px; font-weight: 700; color: var(--text);
+}
+.aiopdf-app .saved-card.selected { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(66, 0, 131, 0.12); }
+.aiopdf-app .saved-card input { accent-color: var(--primary); }
+.aiopdf-app .saved-card-brand {
+  background: var(--accent-soft); color: var(--accent); border-radius: 6px;
+  font-size: 11.5px; font-weight: 900; padding: 3px 8px; letter-spacing: 0.04em;
+}
+.aiopdf-app .saved-card-exp { color: var(--text-muted); font-weight: 600; margin-left: auto; }
+.aiopdf-app .pci-badge { border: 1px solid var(--border-strong); border-radius: 6px; padding: 3px 8px; font-weight: 900; font-size: 11px; }
+
+/* Start remediation (designs 04-07, 12, 13) */
+.aiopdf-app .rem-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 26px 30px; box-shadow: var(--shadow-soft); }
+.aiopdf-app .rem-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.aiopdf-app .rem-head h2 { font-size: 23px; }
+.aiopdf-app .file-row { display: flex; align-items: center; gap: 18px; padding: 20px 0; border-bottom: 1px solid var(--border); }
+.aiopdf-app .file-icon {
+  width: 46px; height: 46px; border-radius: 10px; flex-shrink: 0;
+  background: linear-gradient(135deg, #6a1fb8, #420083); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900;
+  position: relative;
+}
+.aiopdf-app .file-icon.url { background: linear-gradient(135deg, #7a2ec0, #4f0f96); }
+.aiopdf-app .file-info { flex: 1; min-width: 0; }
+.aiopdf-app .file-name { font-size: 17.5px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aiopdf-app .file-meta { color: var(--accent); font-weight: 700; font-size: 15px; margin-top: 4px; }
+.aiopdf-app .file-meta .dot { color: var(--text-muted); margin: 0 7px; }
+.aiopdf-app .source-tabs { display: flex; margin: 24px 0 20px; overflow: hidden; width: fit-content; gap: 20px; }
+.aiopdf-app .source-tab {
+  display: flex; align-items: center; gap: 15px; padding: 17px 40px; font-size: 16.5px; font-weight: 800;
+  background: var(--surface); border-radius: 12px; border: 1px solid var(--border); color: var(--text-soft);
+}
+.aiopdf-app .source-tab.active { background: var(--accent-softer); color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); border-radius: 12px; }
+.aiopdf-app .dropzone {
+  border: 2px dashed #c3b2ec; border-radius: 14px; background: var(--surface-alt);
+  padding: 54px 20px; text-align: center; color: var(--text-muted);
+  font-size: 16.5px; font-weight: 700; cursor: pointer; transition: background 0.12s, border-color 0.12s;
+}
+.aiopdf-app .dropzone:hover,
+.aiopdf-app .dropzone.drag { background: var(--accent-softer); border-color: var(--accent); }
+.aiopdf-app .dropzone .dz-icon {
+  width: 64px; height: 64px; border: 1.5px solid var(--accent); border-radius: 14px;
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; background: var(--surface);
+}
+.aiopdf-app .dz-note { display: flex; justify-content: center; gap: 8px; color: var(--text-soft); font-size: 14.5px; font-weight: 700; margin-top: 14px; }
+.aiopdf-app .dz-note .dot { color: var(--text-muted); }
+.aiopdf-app .url-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px 28px; }
+.aiopdf-app .url-box .url-label { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16.5px; margin-bottom: 14px; }
+.aiopdf-app .rule-callout {
+  align-items: flex-start;
+  background: var(--orange-50);
+  border-radius: var(--radius-sm);
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--orange-300);
+  border-left: 4px solid var(--orange-500);
+  transition: border-color .2s, background .2s;
+}
+
+.aiopdf-app .rule-callout .icon {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #FEE2B8;
+  color: var(--orange-700);
+}
+
+.aiopdf-app .rule-callout svg {
+  color: var(--orange-600);
+  flex: none;
+  height: 20px;
+  margin-top: 2px;
+  width: 20px;
+}
+
+.aiopdf-app .rule-callout strong {
+  color: var(--orange-700);
+  display: block;
+}
+
+.aiopdf-app .rule-callout p {
+  color: #8a5a10;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+.aiopdf-app .url-input-row { display: flex; gap: 16px; }
+.aiopdf-app .url-input-row .input { flex: 1; }
+
+.aiopdf-app .notice-card {
+  background: var(--accent-softer); border: 1px solid var(--accent-soft); border-radius: 14px;
+  padding: 26px 28px; margin: 24px 0; display: flex; gap: 20px;
+}
+.aiopdf-app .notice-icon {
+  width: 64px; height: 64px; border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 26px; font-weight: 900;
+}
+.aiopdf-app .notice-body { flex: 1; }
+.aiopdf-app .notice-body h3 { font-size: 21px; margin-bottom: 10px; }
+.aiopdf-app .notice-body p { margin: 0 0 14px; color: var(--text-soft); font-size: 16px; line-height: 1.6; font-weight: 600; width: 70% }
+.aiopdf-app .notice-pill {
+  display: inline-flex; align-items: center; gap: 10px; background: var(--surface);
+  border: 1px solid var(--accent-soft); border-radius: 12px; padding: 12px 18px;
+  font-size: 15.5px; font-weight: 700; color: var(--text-soft); margin-bottom: 12px;
+}
+.aiopdf-app .notice-pill b { color: var(--accent); }
+.aiopdf-app .notice-plan-parent { display: flex; flex-direction: row; justify-content: space-between; gap: 20px; }
+.aiopdf-app .notice-plan { font-size: 15px; color: var(--text-soft); font-weight: 700; padding-bottom: 14px; border-bottom: 1px solid var(--accent-soft); margin-bottom: 16px; }
+.aiopdf-app .notice-plan b { color: var(--accent); }
+.aiopdf-app .notice-actions { display: flex; align-items: center; gap: 22px; }
+.aiopdf-app .rem-cta-note { color: var(--text-muted); font-weight: 700; font-size: 15px; margin-top: 12px; }
+
+/* Processing (design 08) */
+.aiopdf-app .processing-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 60px 70px; box-shadow: var(--shadow-soft); }
+.aiopdf-app .processing-card h1 { text-align: center; font-size: 34px; padding-bottom: 30px; border-bottom: 1px solid var(--border); margin-bottom: 34px; }
+.aiopdf-app .processing-label { font-size: 19px; font-weight: 700; margin-bottom: 16px; }
+.aiopdf-app .progress-track { height: 12px; border-radius: 999px; background: var(--accent-soft); overflow: hidden; }
+.aiopdf-app .progress-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #420083, #a06bff); transition: width 0.6s ease; }
+.aiopdf-app .email-note {
+  margin-top: 36px; background: var(--accent-softer); border: 1px solid var(--accent-soft); border-radius: 14px;
+  padding: 26px 30px; display: flex; align-items: center; gap: 20px; font-size: 19px; font-weight: 700;
+}
+.aiopdf-app .email-note .mail-icon {
+  width: 54px; height: 54px; border-radius: 12px; border: 1.5px solid var(--accent); color: var(--accent);
+  display: flex; align-items: center; justify-content: center; background: var(--surface); flex-shrink: 0;
+}
+
+/* ============ Dashboard — ADA dashboard design (ada-dashboard-v2) ============
+   These tokens used to sit on `.aiopdf_dashboard-main-content`, the wrapper the
+   module's own sidebar/header layout drew. That layout is gone — the dashboard
+   provides the chrome now — so they live on the module root, where every screen
+   can see them. Anything using var(--ada-*) renders unstyled without this. */
+.aiopdf-app {
+  --ada-primary: #350069;
+  --ada-primary-soft: rgba(66, 0, 131, 0.1);
+  --ada-body-bg: #F8F9FA;
+  --ada-surface: #ffffff;
+  --ada-border: rgba(0, 0, 0, 0.1);
+  --ada-thead: #F0F5F9;
+  --ada-text: #000000;
+  --ada-accent: #420083;
+  --ada-title-grad: linear-gradient(78deg, #D5D1FD 10.33%, #EDEBFF 121.25%);
+}
+.aiopdf-app[data-theme='dark'] {
+  --ada-body-bg: #000000;
+  --ada-surface: #0F0F1A;
+  --ada-border: rgba(255, 255, 255, 0.1);
+  --ada-thead: #000000;
+  --ada-text: #ffffff;
+  --ada-accent: #8b5bba;
+  --ada-title-grad: linear-gradient(135deg, #1A162B 0%, #3A1E66 50%, #6E3CEB 100%);
+}
+.aiopdf-app.aiopdf-embedded {
+  font-family: 'Rubik', 'Segoe UI', system-ui, sans-serif;
+  color: var(--ada-text);
+  font-size: 16px;
+}
+.aiopdf-app .material-symbols-outlined {
+  visibility: hidden;
+}
+.aiopdf-app.fonts-loaded .material-symbols-outlined {
+  visibility: visible;
+}
+.aiopdf-app.aiopdf-embedded .material-symbols-outlined { font-size: 24px; line-height: 1; }
+.aiopdf-app.aiopdf-embedded .material-symbols-outlined.sm { font-size: 18px; }
+
+/* ---- Sidebar ---- */
+.aiopdf-app .aiopdf_dashboard-sidebar {
+  flex: 0 0 auto; width: 330px;
+  background: var(--ada-surface);
+  padding-top: 48px; padding-bottom: 32px;
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; max-height: 100vh;
+}
+@media (min-width: 1700px) { .aiopdf-app .aiopdf_dashboard-sidebar { width: 350px; } }
+.aiopdf-app .aiopdf_dashboard-sidebar-close-btn {
+  display: none; position: absolute; top: 8px; right: 8px;
+  width: 32px; height: 32px; border: none; border-radius: 6px;
+  background: #9f0000; color: #fff; align-items: center; justify-content: center;
+}
+.aiopdf-app .aiopdf_dashboard-sidebar-close-btn .material-symbols-outlined { font-size: 18px; }
+.aiopdf-app .aiopdf_dashboard-sidebar-logo {
+  padding-inline: 12.8px;
+  border-bottom: 1px solid var(--ada-border);
+  margin-bottom: 16px;
+}
+.aiopdf-app .aiopdf_dashboard-sidebar-logo .aiopdf_dashboard-logo { display: flex; align-items: center; }
+.aiopdf-app .aiopdf_dashboard-sidebar-logo .aiopdf_dashboard-logo img { width: auto; max-width: 100%; }
+.aiopdf-app .aiopdf_dashboard-header-user-main-wrapper .aiopdf_dashboard-logo { display: flex; align-items: center; }
+.aiopdf-app .aiopdf_dashboard-header-user-main-wrapper .aiopdf_dashboard-logo img { width: 240px; }
+.aiopdf-app .aiopdf_dashboard-plan-info {
+  max-width: 250px; margin-inline: auto; margin-top: 32px; margin-bottom: 16px;
+  text-align: center; border: 1px solid var(--ada-primary); padding: 10px;
+  border-radius: 5px; overflow: hidden; font-size: 15px;
+  line-height: 1.6;
+}
+.aiopdf-app[data-theme='dark'] .aiopdf_dashboard-plan-info { border-color: var(--ada-accent); }
+.aiopdf-app .aiopdf_dashboard-plan-info strong { font-weight: bolder; color: var(--ada-accent); }
+.aiopdf-app .aiopdf_dashboard-sidebar-navigation {
+  padding-inline: 12.8px; overflow-y: auto; overflow-x: hidden;
+  scrollbar-width: thin; scrollbar-color: var(--ada-primary) #e2d4f0;
+}
+.aiopdf-app .aiopdf_dashboard-sidebar-navigation::-webkit-scrollbar { width: 8px; }
+.aiopdf-app .aiopdf_dashboard-sidebar-navigation::-webkit-scrollbar-track { background: #e2d4f0; }
+.aiopdf-app .aiopdf_dashboard-sidebar-navigation::-webkit-scrollbar-thumb { background: var(--ada-primary); border-radius: 50px; }
+
+.aiopdf-app .aiopdf_dashboard-sidebar-nav ul { margin: 0; padding: 0; list-style: none; margin-top: 8px; }
+.aiopdf-app .aiopdf_dashboard-sidebar-nav li + li { margin-top: 16px; }
+.aiopdf-app .aiopdf_nav-group-label,
+.aiopdf-app .aiopdf_dashboard-sidebar-nav a {
+  display: flex; align-items: center; position: relative;
+  font-weight: 500; padding-top: 8px; padding-bottom: 8px;
+  text-decoration: none; color: var(--ada-text); font-size: 16px;
+}
+.aiopdf-app .aiopdf_nav-group-label { cursor: default; color: var(--ada-accent); }
+.aiopdf-app .aiopdf_dashboard-sidebar-nav .nav-link-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; margin-inline-end: 8px; flex: 0 0 auto;
+}
+.aiopdf-app .aiopdf_dashboard-sidebar-nav .nav-link-text { flex: 1 0 auto; position: relative; width: calc(100% - 32px); line-height: 1.5; }
+.aiopdf-app .aiopdf_dashboard-sidebar-nav .nav-link-text::after {
+  content: ""; position: absolute; right: -20.8px; top: 0; bottom: 0;
+  width: 5px; height: 100%; background: transparent; border-radius: 5px;
+}
+.aiopdf-app .aiopdf_dashboard-sidebar-nav a:hover,
+.aiopdf-app .aiopdf_dashboard-sidebar-nav a.active { color: var(--ada-accent); }
+.aiopdf-app .aiopdf_dashboard-sidebar-nav a:hover .nav-link-text::after,
+.aiopdf-app .aiopdf_dashboard-sidebar-nav a.active .nav-link-text::after { background: var(--ada-primary); }
+.aiopdf-app[data-theme='dark'] .aiopdf_dashboard-sidebar-nav a:hover .nav-link-text::after,
+.aiopdf-app[data-theme='dark'] .aiopdf_dashboard-sidebar-nav a.active .nav-link-text::after { background: var(--ada-accent); }
+.aiopdf-app .aiopdf_nav-sub { padding-inline-start: 33.6px !important; }
+.aiopdf-app .aiopdf_nav-sub li + li { margin-top: 8px !important; }
+
+/* ---- Content wrapper / header ----
+   The wrapper, header and footer rules below belong to the module's standalone
+   layout, which the dashboard's chrome replaced. They are kept only so the
+   stylesheet stays a straight port of the standalone build; no embedded screen
+   renders these elements. */
+.aiopdf-app .aiopdf_dashboard-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding-top: 16px; padding-bottom: 16px;
+  position: sticky; top: 0; z-index: 99;
+  background: var(--ada-body-bg);
+  gap: 16px; flex-wrap: wrap;
+    flex-direction:column-reverse;
+    padding:16px 0;
+    position:sticky;
+}
+.aiopdf-app .aiopdf_dashboard-header-domain-wrapper { display: flex; align-items: flex-start; gap: 12.8px; flex-direction: column; }
+.aiopdf-app .aiopdf_dashboard-domain-dropdown {
+  display: flex; align-items: center; background: var(--ada-surface); border-radius: 5px; overflow:hidden; height:60px; padding:0 10px;
+}
+.aiopdf-app .aiopdf_dashboard-domain-dropdown .domain-avatar {
+  border-radius: 5px; background: var(--ada-primary); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; background-color: #000; 
+  flex: 0 0 auto; margin-inline-end: 16px; height: 40px; width: 40px;
+}
+.aiopdf-app .aiopdf_dashboard-domain-dropdown select {
+  border: none; background: transparent; font-family: inherit; font-size: 20px; min-width:240px; max-width:350px;
+  font-weight: 500; color: var(--ada-text); outline: none; padding-right: 6px; height: 50px; padding: 0;
+}
+.aiopdf-app .aiopdf_dashboard-header-user-main-wrapper { display: flex; align-items: center; }
+.aiopdf-app .aiopdf_dashboard-header-user-wrapper { display: flex; align-items: center; gap: 5.6px; }
+.aiopdf-app .aiopdf_header-tool-btn {
+  display: flex; align-items: center; gap: 4px; font-family: inherit;
+  font-weight: 500; background-color: #0000; color: var(--ada-text); font-size: 16px; line-height: normal; padding: 9.6px; border: none;
+}
+.aiopdf-app .aiopdf_header-tool-btn.aiopdf_border-primary {
+  border: 1px solid var(--ada-primary); border-radius: 10px;
+}
+.aiopdf-app .aiopdf_dashboard-lang-flag { align-items: center; background-color: #420083; border-radius: 4.8px; color: #fff; display: flex; 
+  font-size: 14px; font-weight: 500; height: 24px; justify-content: center; line-height: 1; padding-inline: 4.8px; text-transform: uppercase;
+  width: auto;
+}
+.aiopdf-app .aiopdf_header-tool-btn:hover { background: var(--ada-primary-soft); color: var(--ada-accent); }
+
+.aiopdf-app .aiopdf_user-dropdown { position: relative; }
+.aiopdf-app .aiopdf_user-dropdown-toggle {
+  display: flex; align-items: center; gap: 8px; background: none; border: none;
+  font-family: inherit; font-size: 15px; font-weight: 500; color: var(--ada-text);
+  border-radius: 6px; margin-inline-start: 32px;
+}
+.aiopdf-app .aiopdf_user-dropdown-toggle:hover { background: var(--ada-primary-soft); }
+.aiopdf-app .aiopdf_user-avatar {
+  width: 52px; height: 52px; border-radius: 100%; background: var(--ada-primary); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-weight: 600;
+  font-size: 40px; overflow: hidden;
+}
+.aiopdf-app .aiopdf_user-name {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: normal;
+    text-overflow: ellipsis;
+    width: 120px;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 150px;
+    text-align: left;
+}
+.aiopdf-app .aiopdf_user-dropdown-menu {
+  position: absolute; right: 0; top: calc(100% + 8px); min-width: 230px; z-index: 120;
+  background: var(--ada-surface); border: 1px solid var(--ada-border); border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12); padding: 6.4px;
+}
+.aiopdf-app .aiopdf_user-dropdown-info {
+  padding: 11.2px 12.8px; font-size: 13.5px; color: var(--ada-text); opacity: 0.85;
+  border-bottom: 1px solid var(--ada-border); margin-bottom: 4.8px;
+}
+.aiopdf-app .aiopdf_user-dropdown-info b { display: block; font-weight: 600; margin-bottom: 2px; }
+.aiopdf-app .aiopdf_user-dropdown-menu button {
+  display: flex; align-items: center; gap: 9.6px; width: 100%;
+  background: none; border: none; text-align: left; font-family: inherit; margin-top: 8px;
+  padding: 8px 24px; border-radius: 5px; font-size: 16px; font-weight: 500; color: var(--ada-text);
+}
+.aiopdf-app .aiopdf_user-dropdown-menu button:hover { background: var(--ada-primary-soft); color: var(--ada-accent); }
+.aiopdf-app .aiopdf_user-dropdown-menu button.danger { color: #9f0000; background-color: #9f0000; color: #fff; }
+.aiopdf-app .aiopdf_user-dropdown-menu button .material-symbols-outlined { font-size: 24px; }
+
+.aiopdf-app .aiopdf_dashboard-navigation-toggler-btn {
+  display: none; flex-direction: column; padding: 12.8px 16px; margin-inline-start: 8px;
+  background: var(--ada-primary); border: none; border-radius: 6px; justify-content: center; align-items: center;
+}
+.aiopdf-app .aiopdf_dashboard-navigation-toggler-icon { width: 32px; height: 2px; background: #fff; }
+.aiopdf-app .aiopdf_dashboard-navigation-toggler-icon + .aiopdf_dashboard-navigation-toggler-icon { margin-top: 8px; }
+
+/* ---- Page title (gradient bar) ---- */
+.aiopdf-app main#main { flex: 1 1 auto; }
+.aiopdf-app .aiopdf_dashboard-page-title-wrapper {
+  margin-bottom: 24px; border-radius: 6px; padding: 16px 17px;
+  background: var(--ada-title-grad);
+  display: flex; flex-direction: column; gap: 16px;
+}
+.aiopdf-app[data-theme='dark'] .aiopdf_dashboard-page-title-wrapper { color: #fff; }
+@media (min-width: 992px) {
+  .aiopdf-app .aiopdf_dashboard-page-title-wrapper { flex-direction: row; align-items: center; justify-content: space-between; padding: 10px 14px; }
+}
+.aiopdf-app .aiopdf_dashboard-page-title h1 { font-size: 28.8px; font-weight: 500; margin: 0; }
+.aiopdf-app .aiopdf_dashboard-page-title .subtitle { font-weight: 400; margin-top: 8px; line-height: 160%; font-size: 14px; }
+
+/* ---- ADA buttons ---- */
+.aiopdf-app .aiopdf_btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: inherit; font-size: 15px; font-weight: 600; letter-spacing: 0.48px;
+  border-radius: 6px; padding: 8.8px 16px; border: 1px solid transparent;
+  text-decoration: none; cursor: pointer; transition: background 0.12s, color 0.12s;
+  color: var(--ada-text); background: transparent;
+}
+.aiopdf-app .aiopdf_btn-primary { background: var(--ada-primary); border-color: var(--ada-primary); color: #fff; }
+.aiopdf-app .btn-lg { padding: 12px 20px; }
+.aiopdf-app .btn-transparent { background-color: transparent; color: var(--ada-text); height: 50px; white-space: nowrap; }
+.aiopdf-app .btn-transparent:hover { color: #fff; }
+.aiopdf-app .aiopdf_btn-primary:hover { background: #33006a; }
+.aiopdf-app[data-theme='dark'] .aiopdf_btn-primary { background: linear-gradient(90deg, #7c3aed, #9333ea); border-color: transparent; }
+.aiopdf-app .aiopdf_dashboard-icon-btn .aiopdf_dashboard-btn-icon { display: flex; margin-inline-end: 8px; }
+.aiopdf-app .aiopdf_dashboard-icon-btn .aiopdf_dashboard-btn-icon .material-symbols-outlined { font-size: 17.6px; font-weight: 700; }
+
+/* ---- PDF type tabs (ada pdf-remediation) ---- */
+.aiopdf-app .aiopdf_dashboard-pdf-remediation-type-list-tab { width: 100%; margin-bottom: 24px; }
+.aiopdf-app .aiopdf_dashboard-pdf-remediation-type-list-tab ul {
+  display: flex; align-items: center; margin: 0; padding: 0; list-style: none;
+  border: 1px solid rgba(66, 0, 131, 0.5); border-radius: 5px; overflow: hidden;
+}
+.aiopdf-app[data-theme='dark'] .aiopdf_dashboard-pdf-remediation-type-list-tab ul { border-color: rgba(139, 91, 186, 0.6); }
+.aiopdf-app .aiopdf_dashboard-pdf-remediation-type-list-tab li {
+  padding: 8px; background: var(--ada-primary-soft); flex: 1 0 auto;
+}
+.aiopdf-app .aiopdf_dashboard-pdf-remediation-type-list-tab li .aiopdf_btn { width: 100%; padding: 12px; text-decoration: none; gap: 15px; }
+.aiopdf-app .aiopdf_dashboard-pdf-remediation-type-list-tab li .aiopdf_btn:not(.active) {
+  background: transparent; color: var(--ada-text); border-color: transparent; font-weight: 400; text-decoration: none;
+}
+.aiopdf-app .aiopdf_dashboard-pdf-remediation-type-list-tab li .aiopdf_btn:not(.active):hover { color: var(--ada-accent); }
+
+/* ---- Re-skin existing page components to the ADA look ---- */
+.aiopdf-app.aiopdf-embedded { padding-bottom: 16px; }
+.aiopdf-app.aiopdf-embedded .panel {
+  background: var(--ada-surface); border: 1px solid var(--ada-border);
+  border-radius: 10px; box-shadow: none;
+}
+.aiopdf-app.aiopdf-embedded .filters-row { padding: 24px 16px; gap: 14px; }
+.aiopdf-app.aiopdf-embedded .filters-row h3 { font-weight: 600; }
+.aiopdf-app.aiopdf-embedded .panel-head { padding: 24px 32px 8px; }
+.aiopdf-app.aiopdf-embedded .panel-head h3 { font-weight: 600; }
+.aiopdf-app.aiopdf-embedded .upload-split { padding: 24px 32px; }
+.aiopdf-app.aiopdf-embedded .v-divider { background: var(--ada-border); }
+.aiopdf-app.aiopdf-embedded .input,
+.aiopdf-app.aiopdf-embedded .select {
+  font-family: inherit; border-radius: 5px; border: 1px solid var(--ada-border);
+  background: var(--ada-surface); color: var(--ada-text); font-size: 15px;
+}
+.aiopdf-app.aiopdf-embedded .input:focus,
+.aiopdf-app.aiopdf-embedded .select:focus { border-color: var(--ada-primary); box-shadow: 0 0 0 3px rgba(66, 0, 131, 0.15); }
+.aiopdf-app.aiopdf-embedded .dropzone {
+  border: 2px dashed rgba(66, 0, 131, 0.35); border-radius: 10px;
+  background: var(--ada-body-bg); color: var(--ada-accent); font-weight: 500;
+}
+.aiopdf-app.aiopdf-embedded .dropzone:hover,
+.aiopdf-app.aiopdf-embedded .dropzone.drag { background: var(--ada-primary-soft); border-color: var(--ada-primary); }
+.aiopdf-app.aiopdf-embedded .dropzone .dz-icon { border-color: var(--ada-primary); background: var(--ada-surface); }
+.aiopdf-app.aiopdf-embedded .dz-note { color: var(--ada-text); opacity: 0.75; font-weight: 500; }
+.aiopdf-app.aiopdf-embedded .scan-side h3 { font-weight: 600; }
+
+.aiopdf-app.aiopdf-embedded .data-table th {
+  background: var(--ada-thead); color: var(--ada-text);
+  font-size: 16px; font-weight: 500; padding: 9.6px 16px;
+  border-bottom: 1px solid var(--ada-border);
+}
+.aiopdf-app.aiopdf-embedded .data-table td {
+  padding: 14.4px 16px; font-size: 15px; font-weight: 400;
+  border-bottom: 1px solid var(--ada-border); color: var(--ada-text);
+}
+.aiopdf-app.aiopdf-embedded .doc-sub { color: inherit; opacity: 0.65; }
+.aiopdf-app.aiopdf-embedded .status-chip { border-radius: 5px; font-weight: 500; font-size: 14px; padding: 6.4px 14.4px; }
+.aiopdf-app.aiopdf-embedded .src-chip { border-radius: 5px; font-weight: 500; }
+.aiopdf-app.aiopdf-embedded .bulk-footer {
+  background: var(--ada-thead); border-top: 1px solid var(--ada-border);
+  padding: 12.8px 16px; border-radius: 0 0 10px 10px;
+}
+.aiopdf-app.aiopdf-embedded .bulk-icon { background: var(--ada-primary); border-radius: 6px; }
+.aiopdf-app.aiopdf-embedded .bulk-meta { color: var(--ada-text); font-weight: 400; }
+.aiopdf-app.aiopdf-embedded .bulk-meta b { font-weight: 600; }
+.aiopdf-app.aiopdf-embedded .aiocheckbox { accent-color: var(--ada-primary); width: 20.8px; height: 20.8px; }
+.aiopdf-app.aiopdf-embedded .empty-state { color: var(--ada-text); opacity: 0.6; font-weight: 400; }
+.aiopdf-app.aiopdf-embedded .btn { font-family: inherit; border-radius: 6px; font-weight: 600; letter-spacing: 0.48px; }
+.aiopdf-app.aiopdf-embedded .btn-gradient { background: var(--ada-primary); box-shadow: none; }
+.aiopdf-app.aiopdf-embedded .btn-delete { background: var(--danger); box-shadow: none; }
+.aiopdf-app.aiopdf-embedded .btn-gradient:not(:disabled):hover { background: #33006a; }
+.aiopdf-app.aiopdf-embedded[data-theme='dark'] .btn-gradient { background: linear-gradient(90deg, #7c3aed, #9333ea); }
+.aiopdf-app.aiopdf-embedded .btn-outline { border-color: var(--ada-primary); color: var(--accent); background: var(--ada-surface); }
+.aiopdf-app.aiopdf-embedded .btn-outline:not(:disabled):hover { background: var(--ada-primary); color: #fff; transform: none; }
+.aiopdf-app.aiopdf-embedded .btn-soft { background: var(--ada-primary-soft); color: var(--ada-accent); }
+.aiopdf-app.aiopdf-embedded .rem-cta-note { color: var(--ada-text); opacity: 0.65; font-weight: 400; }
+.aiopdf-app.aiopdf-embedded .inline-progress { border-bottom: 1px solid var(--ada-border); }
+.aiopdf-app.aiopdf-embedded .progress-track { background: var(--ada-primary-soft); }
+.aiopdf-app.aiopdf-embedded .search-box .input { width: 300px; }
+
+/* The search input and the filter selects sit on the same row and read as one
+   set of controls, so they share a corner radius as well as a height. */
+.aiopdf-app.aiopdf-embedded .search-box .input,
+.aiopdf-app.aiopdf-embedded .filter-group .select { border-radius: 9px; }
+
+/* ---- Orders (ada order list) ---- */
+.aiopdf-app .order-desc { line-height: 1.7; }
+.aiopdf-app .order-desc b { font-weight: 600; }
+.aiopdf-app .order-status { font-weight: 600; font-size: 15px; }
+.aiopdf-app .order-status.paid { color: #1f5c21; }
+.aiopdf-app .order-status.free { color: #15803d; }
+.aiopdf-app[data-theme='dark'] .order-status.paid,
+.aiopdf-app[data-theme='dark'] .order-status.free { color: #59a25b; }
+.aiopdf-app .order-actions { display: flex; gap: 10px; justify-content: center; }
+.aiopdf-app .order-action-btn {
+  width: 42px; height: 36px; display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--ada-border, rgba(0,0,0,0.2)); border-radius: 6px;
+  background: var(--ada-surface, #fff); color: var(--ada-text, #000); cursor: pointer;
+}
+.aiopdf-app .order-action-btn:hover { border-color: var(--ada-primary, #420083); color: var(--ada-accent, #420083); }
+.aiopdf-app .order-action-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* pagination */
+.aiopdf-app .aiopdf_dashboard-table-pagination-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--accent-softer);
+  border-top: 1px solid var(--accent-soft);
+}
+
+.aiopdf-app .pagination {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.aiopdf-app .page-item .page-link {
+  min-width: 36px;
+  height: 36px;
+  border: 1px solid #ddd;
+  background: var(--bg);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--ada-text);
+}
+
+.aiopdf-app .page-item.active .page-link {
+  background: #420083;
+  color: #fff;
+  border-color: #420083;
+}
+
+.aiopdf-app .page-item.disabled .page-link {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* searchable select option */
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select {
+  min-width: 230px;
+  width: 100%;
+  font-size: 14px;
+}
+
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__control {
+  min-height: 38px;
+  height: 38px;
+  border: 1px solid var(--border-color, #d6d6d6);
+  border-radius: 6px !important;
+  background: var(--card-bg, #fff);
+  box-shadow: none;
+  cursor: pointer;
+  transition: border-color .2s ease;
+}
+
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__control:hover {
+  border-color: var(--accent);
+}
+
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__control--is-focused {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 1px var(--ada-accent) !important;
+}
+
+/* Value container */
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__value-container {
+  padding: 0 10px;
+}
+
+/* Placeholder */
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__placeholder {
+  color: #8b8b8b;
+}
+
+/* Selected value */
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__single-value {
+  color: var(--text-color, #212529);
+}
+
+/* Input */
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__input-container {
+  color: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+/* Dropdown indicator */
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__dropdown-indicator {
+  color: #9ca3af;
+  transition: .2s;
+}
+
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__dropdown-indicator:hover {
+  color: #6c2bd9;
+}
+
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__indicator-separator {
+  background: #e5e7eb;
+}
+
+/* Menu */
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__menu {
+  margin-top: 6px;
+  border: 1px solid var(--border-color, #d6d6d6);
+  border-radius: 6px !important;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(0,0,0,.12);
+  z-index: 999;
+}
+
+/* Options */
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__option {
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__option--is-focused {
+  background: rgba(108,43,217,.08);
+  color: inherit;
+}
+
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__option--is-selected {
+  background: var(--primary);
+  color: #fff;
+}
+
+.aiopdf-app .aiopdf_dashboard-custom-domain-filter-select__option:active {
+  background: rgba(108,43,217,.15);
+}
+
+.aiopdf-app[data-theme="dark"] .aiopdf_dashboard-custom-domain-filter-select__control {
+  background: var(--ada-surface);
+  border-color: var(--ada-surface);
+}
+
+.aiopdf-app[data-theme="dark"] .aiopdf_dashboard-custom-domain-filter-select__menu {
+  background: var(--ada-surface);
+  border-color: var(--ada-surface);
+}
+
+.aiopdf-app[data-theme="dark"] .aiopdf_dashboard-custom-domain-filter-select__single-value,
+.aiopdf-app[data-theme="dark"] .aiopdf_dashboard-custom-domain-filter-select__input-container,
+.aiopdf-app[data-theme="dark"] .aiopdf_dashboard-custom-domain-filter-select__placeholder {
+  color: #e5e7eb;
+}
+
+.aiopdf-app[data-theme="dark"] .aiopdf_dashboard-custom-domain-filter-select__option {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+.aiopdf-app[data-theme="dark"] .aiopdf_dashboard-custom-domain-filter-select__option--is-focused {
+  background: var(--ada-surface);
+}
+
+.aiopdf-app[data-theme="dark"] .aiopdf_dashboard-custom-domain-filter-select__indicator-separator {
+  background: #374151;
+}
+
+/* ---- Footer ---- */
+.aiopdf-app .aiopdf_dashboard-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12.8px; padding: 24px 0; font-size: 15px;
+}
+.aiopdf-app .aiopdf_dashboard-footer a { color: var(--ada-text); text-decoration: none; }
+.aiopdf-app .aiopdf_dashboard-footer a:hover { color: var(--ada-accent); text-decoration: none; }
+.aiopdf-app .aiopdf_dashboard-footer-nav ul { display: flex; flex-wrap: wrap; margin: 0; padding: 0; list-style: none; }
+.aiopdf-app .aiopdf_dashboard-footer-nav li + li { margin-inline-start: 24px; }
+
+.aiopdf-app .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); }
+.aiopdf-app .upload-split { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 26px; padding: 26px; align-items: stretch; }
+.aiopdf-app .v-divider { background: var(--border); }
+/* With the add-by-URL side removed, the drop zone spans the whole panel. */
+.aiopdf-app .upload-split.upload-split-single { grid-template-columns: 1fr; }
+.aiopdf-app .scan-side h3 { font-size: 18px; margin-bottom: 16px; }
+
+.aiopdf-app .table-panel { margin-top: 24px; }
+.aiopdf-app .table-panel .panel-head { padding: 24px 16px; }
+.aiopdf-app .panel-head h3 { font-size: 20px; }
+.aiopdf-app .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.aiopdf-app .data-table { width: 100%; border-collapse: collapse; }
+.aiopdf-app .text-center { text-align: center !important; }
+.aiopdf-app .data-table th {
+  text-align: left; font-size: 13.5px; color: var(--text-soft); font-weight: 800;
+  background: var(--surface-alt); padding: 12px 18px; border-bottom: 1px solid var(--border);
+}
+.aiopdf-app .data-table td { padding: 15px 18px; border-bottom: 1px solid var(--border); font-size: 15.5px; font-weight: 700; vertical-align: middle; }
+.aiopdf-app .data-table tr:last-child td { border-bottom: none; }
+.aiopdf-app .doc-cell { display: flex; align-items: center; gap: 13px; min-width: 0; }
+.aiopdf-app .doc-cell .mini-icon {
+  width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 900;
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+.aiopdf-app .doc-cell .mini-icon.purple { background: linear-gradient(135deg, #6a1fb8, #420083); }
+.aiopdf-app .doc-cell .mini-icon.link { background: linear-gradient(135deg, #7a2ec0, #4f0f96); }
+.aiopdf-app .data-table .table-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.aiopdf-app .doc-sub { display: block; font-size: 13px; color: var(--text-muted); font-weight: 600; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 480px; }
+.aiopdf-app .doc-sub a { color: var(--accent); }
+.aiopdf-app .src-chip { display: inline-block; border-radius: 8px; font-size: 12.5px; font-weight: 800; padding: 5px 12px; }
+.aiopdf-app .src-chip.file { background: var(--accent-soft); color: var(--accent); }
+.aiopdf-app .src-chip.url { background: #e0f2fe; color: #0369a1; }
+.aiopdf-app[data-theme='dark'] .src-chip.url { background: #0c3552; color: #7dd3fc; }
+.aiopdf-app .src-chip.scan { background: var(--surface-alt); color: var(--text-soft); border: 1px solid var(--border); }
+
+.aiopdf-app .status-chip { display: inline-flex; align-items: center; gap: 7px; border-radius: 999px; font-size: 13.5px; font-weight: 800; padding: 6px 14px; white-space: nowrap; }
+.aiopdf-app .status-chip.scanning { background: var(--accent-soft); color: var(--accent); }
+.aiopdf-app .status-chip.pending { background: var(--warning-bg); color: var(--warning); }
+.aiopdf-app .status-chip.remediated,
+.aiopdf-app .status-chip.completed { background: var(--success-bg); color: var(--success); }
+.aiopdf-app .status-chip.ready { background: #e0f2fe; color: #0369a1; }
+.aiopdf-app[data-theme='dark'] .status-chip.ready { background: #0c3552; color: #7dd3fc; }
+.aiopdf-app .status-chip.processing { background: var(--accent-soft); color: var(--accent); }
+.aiopdf-app .status-chip.error { background: var(--danger-soft); color: var(--danger); }
+.aiopdf-app .spin { animation: spin 1.1s linear infinite; display: inline-flex; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.aiopdf-app .filters-row { display: flex; align-items: center; gap: 14px; padding: 18px 26px; flex-wrap: wrap; }
+.aiopdf-app .filters-row .grow { flex: 1; }
+.aiopdf-app .filters-row .filters-actions { display: flex; gap: 14px; align-items: center; }
+.aiopdf-app .filter-group { display: flex; align-items: center; gap: 9px; font-size: 16px; color: var(--text-soft); }
+/* A filter select sits next to the search input, so it has to be the same
+   control: only the width and the room for the arrow differ. Font size, border
+   and radius are deliberately NOT restated here — they fall through to the
+   shared .input/.select rules above, which is what keeps the two boxes the same
+   height and shape. */
+.aiopdf-app .filter-group .select {
+  width: auto;
+  padding: 13px 40px 13px 15px;
+  font-weight: 400;
+}
+.aiopdf-app .search-box { position: relative; }
+.aiopdf-app .search-box .input { padding-left: 40px; width: 300px; }
+.aiopdf-app .search-box svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text); }
+
+.aiopdf-app .bulk-footer {
+  display: flex; align-items: center; gap: 18px; padding: 16px 26px; flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+}
+.aiopdf-app .bulk-icon { width: 44px; height: 44px; border-radius: 11px; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; }
+.aiopdf-app .bulk-meta { font-size: 15px; font-weight: 700; color: var(--text-soft); display: flex; gap: 16px; align-items: center; }
+.aiopdf-app .bulk-meta b { color: var(--text); }
+.aiopdf-app .bulk-sep { width: 1px; height: 22px; background: var(--border-strong); }
+.aiopdf-app .aiocheckbox { width: 18px; height: 18px; accent-color: var(--primary); }
+
+.aiopdf-app .inline-progress { padding: 20px 26px; border-bottom: 1px solid var(--border); }
+
+.aiopdf-app .empty-state { padding: 48px 20px; text-align: center; color: var(--text-muted); font-weight: 700; font-size: 15.5px; }
+
+/* Toast */
+.aiopdf-app .toast {
+  position: fixed; bottom: 26px; right: 26px; z-index: 100;
+  background: var(--text); color: var(--bg);
+  border-radius: 12px; padding: 14px 20px; font-weight: 700; font-size: 15px;
+  box-shadow: var(--shadow); max-width: 380px;
+}
+.aiopdf-app .toast.success { background: #14532d !important; color: #dcfce7 !important; }
+.aiopdf-app .toast.error { background: #7f1d1d !important; color: #fee2e2 !important; }
+
+/* Modal */
+.aiopdf-app .modal-backdrop { position: fixed; inset: 0; background: rgba(20, 12, 46, 0.55); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.aiopdf-app .modal { background: var(--surface); border-radius: 16px; padding: 28px; width: 420px; max-width: calc(100vw - 40px); box-shadow: var(--shadow); }
+.aiopdf-app .modal h3 { margin-bottom: 18px; font-size: 20px; }
+.aiopdf-app .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; }
+
+/* AI Suggestions popup */
+.aiopdf-app .suggestions-modal { width: 720px; max-height: 84vh; overflow-y: auto; }
+.aiopdf-app .sug-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.aiopdf-app .sug-head h3 { display: flex; align-items: center; gap: 8px; color: var(--primary); }
+.aiopdf-app .close-btn-model { background: var(--danger); border: none; display: flex; align-items: center; padding: 5px; border-radius: 5px; color: #fff; }
+.aiopdf-app .sug-sub { font-size: 13.5px; color: var(--text-soft); font-weight: 600; }
+.aiopdf-app .sug-summary { display: flex; gap: 10px; margin-bottom: 14px; }
+.aiopdf-app .sug-list { display: flex; flex-direction: column; gap: 10px; }
+.aiopdf-app .sug-item { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.aiopdf-app .sug-item.failed { border-color: color-mix(in srgb, var(--warning) 45%, var(--border)); }
+.aiopdf-app .sug-row {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+  background: none; border: none; padding: 9px 14px; font-family: var(--font);
+  white-space: nowrap; overflow: hidden;
+}
+.aiopdf-app .sug-row:hover { background: var(--surface-alt); }
+.aiopdf-app .sug-dot {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.aiopdf-app .sug-dot.passed { background: var(--success-bg); color: var(--success); }
+.aiopdf-app .sug-dot.failed { background: var(--warning-bg); color: var(--warning); }
+.aiopdf-app .sug-title {
+  flex: 0 1 auto; font-weight: 800; font-size: 14.5px; color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+.aiopdf-app .sug-detail {
+  flex: 1 1 auto; font-weight: 600; font-size: 13px; color: var(--text-soft);
+  overflow: hidden; text-overflow: ellipsis; min-width: 40px;
+}
+.aiopdf-app .sug-fixchip { flex: 0 0 auto; }
+.aiopdf-app .sug-caret { color: var(--text-muted); font-size: 13px; flex: 0 0 auto; }
+@media (max-width: 640px) { 
+  .aiopdf-app .sug-detail { display: none; } 
+  .aiopdf-app .card-details { grid-template-columns: 1fr; gap: 0px }
+  .aiopdf-app .pay-card-head { flex-wrap: wrap; gap: 20px }
+  .aiopdf-app .aiopdf_dashboard-pdf-remediation-type-list-tab ul { flex-direction: column; align-items: stretch; }
+  .aiopdf-app .url-input-row { flex-direction: column; align-items: stretch; }
+}
+.aiopdf-app .sug-body { padding: 4px 16px 16px 52px; }
+.aiopdf-app .sug-body p { margin: 0 0 12px; font-size: 14px; line-height: 1.6; color: var(--text-soft); font-weight: 600; }
+.aiopdf-app .sug-body p b { color: var(--text); }
+.aiopdf-app .sug-example { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.aiopdf-app .sug-example-col { border-radius: 10px; border: 1px solid var(--border); overflow: hidden; }
+.aiopdf-app .sug-example-col.before { border-color: color-mix(in srgb, var(--danger) 35%, var(--border)); }
+.aiopdf-app .sug-example-col.after { border-color: color-mix(in srgb, var(--success) 40%, var(--border)); }
+.aiopdf-app .sug-example-label {
+  font-size: 11.5px; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 6px 10px;
+}
+.aiopdf-app .sug-example-col.before .sug-example-label { background: var(--danger-soft); color: var(--danger); }
+.aiopdf-app .sug-example-col.after .sug-example-label { background: var(--success-bg); color: var(--success); }
+.aiopdf-app .sug-example pre {
+  margin: 0; padding: 10px 12px; font-size: 12px; line-height: 1.5;
+  white-space: pre-wrap; word-break: break-word;
+  font-family: 'Consolas', 'Menlo', monospace; color: var(--text-soft);
+  background: var(--surface-alt); min-height: 72px;
+}
+.aiopdf-app .sug-footnote { margin: 14px 0 0; font-size: 13.5px; font-weight: 700; color: var(--accent); }
+@media (max-width: 760px) { 
+  .aiopdf-app .sug-example { grid-template-columns: 1fr; } 
+  .aiopdf-app .bulk-meta { flex: 1; }
+  .aiopdf-app .bulk-footer > div:last-child { flex: 0 0 100%; margin-left: 0 !important; }
+  .aiopdf-app .bulk-footer .btn { width: 100%; }
+  .aiopdf-app .aiopdf_dashboard-header{ position:relative; top:auto; }
+  .aiopdf-app .aiopdf_dashboard-domain-dropdown { width:100%; }
+  .aiopdf-app .aiopdf_dashboard-domain-dropdown select { width:100%; min-width:0; }
+  .aiopdf-app .aiopdf_dashboard-header-user-wrapper { flex-wrap:wrap; justify-content:flex-end; }
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .aiopdf-app .auth-layout { grid-template-columns: 1fr; }
+  .aiopdf-app .auth-panel { display: none; }
+  .aiopdf-app .onb-layout { grid-template-columns: 1fr; }
+  .aiopdf-app .onb-sidebar { display: none; }
+  .aiopdf-app .upload-split { grid-template-columns: 1fr; }
+  .aiopdf-app .v-divider { display: none; }
+  .aiopdf-app .price-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ADA dashboard mobile: sidebar slides in from the right (like ada-dashboard-v2) */
+@media (max-width: 1399px) {
+  .aiopdf-app .aiopdf_dashboard-sidebar {
+    position: fixed; top: 0; right: 0; z-index: 9999;
+    width: 360px; max-width: 100%; height: 100vh; max-height: 100vh;
+    display: none; box-shadow: -12px 0 40px rgba(0, 0, 0, 0.2);
+  }
+  .aiopdf-app .aiopdf_dashboard-sidebar.active { display: flex; }
+  .aiopdf-app .aiopdf_dashboard-sidebar-close-btn { display: flex; }
+  .aiopdf-app .aiopdf_dashboard-navigation-toggler-btn { display: flex; }
+}
+@media (max-width: 575px) {
+  .aiopdf-app .aiopdf_dashboard-sidebar { width: 100%; }
+  .aiopdf-app .aiopdf_dashboard-content-wrapper { padding-inline: 16px; }
+  .aiopdf-app .aiopdf_dashboard-page-title h1 { font-size: 20.8px; }
+  .aiopdf-app .aiopdf_dashboard-pdf-remediation-type-list-tab li { border-bottom: 1px solid rgba(66, 0, 131, 0.3); }
+  .aiopdf-app .aiopdf_dashboard-pdf-remediation-type-list-tab li:last-child { border-bottom: 0; }
+  .aiopdf-app .form-row { grid-template-columns: 1fr; gap: 0 }
+}
+
+@media (max-width: 500px) {
+.aiopdf-app .filters-row .filters-actions { flex-wrap: wrap; }
+.aiopdf-app .filters-row .filters-actions .filter-group { flex-wrap: wrap; justify-content: space-between; width: 100%; }
+}
+
+@media (min-width: 768px) {
+    .aiopdf-app .aiopdf_dashboard-header .aiopdf_dashboard-header-domain-wrapper {
+        align-items: center;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .aiopdf-app .aiopdf_dashboard-header-domain-wrapper .aiopdf_dashboard-domain-dropdown {
+        width: 352px;
+    }
+    .aiopdf-app .aiopdf_dashboard-domain-dropdown-btn {
+      min-width: 352px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .aiopdf-app .aiopdf_dashboard-header .aiopdf_dashboard-header-domain-wrapper {
+        justify-content: flex-start;
+        margin-top: 0;
+    }
+    .aiopdf-app .aiopdf_dashboard-header{
+        flex-direction:row;
+        align-items:center;
+        justify-content:space-between;
+    }
+    .aiopdf-app .aiopdf_dashboard-sidebar {
+      display: flex;
+      padding-top: 32px;
+      position: sticky;
+      top: 0;
+    }
+    .aiopdf-app .aiopdf_dashboard-header-user-main-wrapper .aiopdf_dashboard-logo {
+      display: none;
+    }
+}
+@media (max-width: 1366px) {
+  .aiopdf-app .aiopdf_user-name{ display: none; }
+  .aiopdf-app .aiopdf_user-dropdown-toggle { margin-inline-start: 0; }
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-btn {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 18px 10px 10px;
+  background: var(--ada-surface, #fff);
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  transition: .2s ease;
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-btn {
+  display: flex;
+  align-items: center;
+}
+
+.aiopdf-app .dropdown-arrow {
+  margin-left: auto;
+  width: 17px;
+  height: 10px;
+  color: currentColor;
+  transition: transform .2s ease;
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-btn-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-btn-item:hover {
+  background: rgba(108, 43, 217, 0.05);
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-btn-item:hover {
+  background: rgba(108, 43, 217, 0.05);
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-btn:hover {
+  background: rgba(108, 43, 217, 0.08);
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-favicon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 6px;
+  background: rgba(108, 43, 217, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 14px;
+  font-weight: 600;
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-favicon.no-icon {
+  background: #000;
+  color: #fff;
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-text {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* ================= Dropdown ================= */
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-list-wrapper {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  background: var(--ada-surface, #fff);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 999;
+  box-shadow: 0 15px 35px rgba(0,0,0,.12);
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-list {
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-list::-webkit-scrollbar-thumb {
+  background: #6c2bd9;
+  border-radius: 20px;
+}
+
+/* ================= Search ================= */
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-search {
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-search input {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  font-size: 15px;
+}
+.aiopdf-app[data-theme='dark'] .aiopdf_dashboard-domain-dropdown-search input {
+  background-color: var(--bg);
+}
+
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-search input:focus {
+  border-color: var(--accent);
+}
+
+/* ================= Items ================= */
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-btn-box+.aiopdf_dashboard-domain-dropdown-btn-box {
+  margin-top: 8px;
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-list
+.aiopdf_dashboard-domain-dropdown-btn-item {
+  padding: 10px;
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-list
+.aiopdf_dashboard-domain-dropdown-btn-item.active {
+  background: rgba(108,43,217,0.08);
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.aiopdf-app[data-theme='dark'] .aiopdf_dashboard-domain-dropdown-btn-item.active {
+  background: rgba(108, 43, 217, 0.25);
+  border-radius: 8px;
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-list
+.aiopdf_dashboard-domain-dropdown-btn-item:hover {
+  background: rgba(108,43,217,0.05);
+}
+
+.aiopdf-app[data-theme='dark'] .aiopdf_dashboard-domain-dropdown-btn-item:hover {
+  background: rgba(108,43,217,0.20);
+}
+
+/* ================= Footer ================= */
+
+.aiopdf-app .aiopdf_dashboard-view-all-domain {
+  border-top: 1px solid rgba(0,0,0,.08);
+}
+
+.aiopdf-app .aiopdf_dashboard-view-all-domain a {
+  display: block;
+  text-align: center;
+  padding: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--ada-primary, #6c2bd9);
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-btn-box {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.aiopdf-app .aiopdf_dashboard-domain-dropdown-btn-box:last-child {
+  border-bottom: none;
+}
+
+/* ================= Responsive ================= */
+
+@media (max-width: 768px) {
+
+  .aiopdf-app .aiopdf_dashboard-domain-dropdown-wrapper {
+    max-width: 100%;
+  }
+
+  .aiopdf-app .aiopdf_dashboard-domain-dropdown-btn {
+    padding: 10px 16px 10px 10px;
+    min-width: 352px;
+  }
+
+  .aiopdf-app .aiopdf_dashboard-domain-dropdown-text {
+    font-size: 16px;
+  }
+
+  .aiopdf-app .aiopdf_dashboard-domain-dropdown-list-wrapper {
+    width: 100%;
+  }
+
+  .aiopdf-app .aiopdf_dashboard-domain-dropdown-list {
+    max-height: 300px;
+  }
+}
+
+@media (min-width: 576px) {
+  .aiopdf-app .aiopdf_dashboard-header-user-main-wrapper .aiopdf_dashboard-logo img {
+    width: 340px;
+  }
+}
+
+/* delete confirmation model */
+.aiopdf-app .modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.52);
+}
+
+.aiopdf-app .confirmation-modal {
+  width: min(800px, calc(100% - 32px));
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+}
+
+/* Header */
+
+.aiopdf-app .modal-header {
+  height: 68px;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #ddd;
+}
+
+.aiopdf-app .modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #111;
+}
+
+.aiopdf-app .modal-close {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 7px;
+  background: #b40000;
+  color: #fff;
+  font-size: 36px;
+  font-weight: 300;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.aiopdf-app .modal-close:hover {
+  background: #960000;
+}
+
+/* Body */
+
+.aiopdf-app .modal-body {
+  min-height: 54px;
+  padding: 18px 15px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.aiopdf-app .modal-body p {
+  margin: 0;
+  font-size: 16px;
+  color: #222;
+}
+
+.aiopdf-app .modal-body strong {
+  font-weight: 700;
+}
+
+/* Footer */
+
+.aiopdf-app .modal-footer {
+  min-height: 74px;
+  padding: 12px 13px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.aiopdf-app .modal-footer button {
+  height: 50px;
+  padding: 0 17px;
+  border: 0;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.aiopdf-app .btn-delete {
+  min-width: 86px;
+  background: #b40000;
+  color: #fff;
+}
+
+.aiopdf-app .btn-delete:hover {
+  background: #960000;
+}
+
+.aiopdf-app .btn-cancel {
+  min-width: 91px;
+  background: #4b008f;
+  color: #fff;
+}
+
+.aiopdf-app .btn-cancel:hover {
+  background: #39006d;
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  .aiopdf-app .modal-overlay {
+    padding-top: 20px;
+  }
+
+  .aiopdf-app .confirmation-modal {
+    width: calc(100% - 24px);
+  }
+
+  .aiopdf-app .modal-header h2 {
+    font-size: 20px;
+  }
+
+  .aiopdf-app .modal-footer {
+    flex-wrap: wrap;
+  }
+}
+
+
+/* ============================================================================
+   Host-page additions
+   ------------------------------------------------------------------------
+   The stylesheet above is the module's file verbatim, with the handful of
+   selectors that were written unscoped (.modal-overlay, .confirmation-modal,
+   .btn-delete, .btn-cancel, the loader) moved under `.aiopdf-app` so nothing
+   can reach the host page around it.
+
+   Everything below covers what the host page used to supply: the two utility
+   classes the module inherited from its dashboard (.icon-btn, .visually-hidden),
+   the plain-markup equivalents of a few inline styles, and the adjustments a
+   host page's own layout needs.
+   ========================================================================= */
+
+/* The section sits inside a host page's content area, so it must not behave
+   like a page of its own: no full-viewport height and no background. Both are
+   handled by `.aiopdf-embedded`, which the markup always applies. */
+
+/* `hidden` must win over the display rules the module sets on .modal-overlay,
+   .modal-backdrop, .toast and .dz-note — all of which are display:flex/block.
+   Scoped, so the host page's own [hidden] handling is untouched. */
+.aiopdf-app [hidden],
+.aiopdf-app[hidden] { display: none !important; }
+
+/* Only the active tab's panel is in the document flow. */
+.aiopdf-app .aiopdf-tab-panel { display: block; }
+
+/* Supplied by the dashboard in the embedded build. */
+.aiopdf-app .icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none; background: none; cursor: pointer; padding: 5px; border-radius: 5px;
+}
+.aiopdf-app .visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Leading icon inside a URL field (was an inline-styled <span> in React). */
+.aiopdf-app .url-input-icon {
+  position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); display: inline-flex;
+}
+
+/* Row action cluster in the Documents table. */
+.aiopdf-app .row-actions {
+  display: flex; justify-content: center; align-items: center; gap: 12px;
+}
+
+/* The two buttons on the right of the bulk footer. */
+.aiopdf-app .bulk-actions {
+  margin-left: auto; display: flex; flex-direction: row; flex-wrap: wrap; gap: 20px;
+}
+
+/* The tab row's icons are wrapped in a span rather than rendered directly. */
+.aiopdf-app .tab-ico { display: inline-flex; align-items: center; }
+[data-icon]:before {
+    content: "";
+        display: flex;
+}
+/* .filter-group labels are <label> elements here — keep them from wrapping
+   away from their control. */
+.aiopdf-app .filter-group label { margin: 0; white-space: nowrap; }
+
+/* Buttons carrying an icon span need the same gap the React icons got. */
+.aiopdf-app .status-chip button,
+.aiopdf-app .link-danger span,
+.aiopdf-app .btn span { display: inline-flex; align-items: center; }
+
+/* ---- Full-screen table loader -------------------------------------------
+   De-nested from the original (which used native CSS nesting) so the rules
+   survive any CSS pipeline the plugin build happens to run them through. */
+.aiopdf-app .aioa_dashboard-fullscreen-loader {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent linear-gradient(117deg, rgba(255, 255, 255, 0.70) 0%, rgba(212, 212, 212, 0.8) 100%) 0% 0% no-repeat padding-box;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.aiopdf-app .aioa_dashboard-loader {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.aiopdf-app .aioa_dashboard-loader svg { width: 120px; height: 120px; }
+.aiopdf-app[data-theme='dark'] .aioa_dashboard-fullscreen-loader {
+  background: rgba(10, 6, 24, 0.72);
+}
+
+/* ---- Standalone page ground ----------------------------------------------
+   Embedded in a host page, these come from the page around it. Standing on its
+   own, the page has to supply them. Drop the `body` rule when embedding the
+   section into a host page that already has one; keep everything else. */
+body {
+  margin: 0;
+  /* padding: 24px; */
+  background: #f6f6f9;
+  font-family: 'Rubik', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+@media (min-width: 992px) {
+  /* body { padding: 32px; } */
+}
+#action-buttons
+{
+  display: none!important;
+}
+body[data-theme='dark'] { background: #0d0a18; }
+
+.aiopdf-app.aiopdf-embedded,
+.aiopdf-app.aiopdf-embedded * { font-family: var(--font); }
+
+.aiopdf-app.aiopdf-embedded h1,
+.aiopdf-app.aiopdf-embedded h2,
+.aiopdf-app.aiopdf-embedded h3 { font-weight: 700; }
+
+.aiopdf-app.aiopdf-embedded a { color: var(--primary); }
+
+/* ---- The account ---------------------------------------------------------
+   Who this workspace is connected as, and the dialog that asks. Neither is
+   host-specific — they belong to the module wherever it runs. */
+
+/* Who this workspace is connected as, under the page title. */
+.aiopdf-app .aiopdf-account-bar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px;
+  margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--text-soft);
+}
+.aiopdf-app .aiopdf-account-bar b { color: var(--text); font-weight: 800; }
+
+/* Plan usage, under the account line: which plan this account is on, how many
+   pages it has left, and one button through to the dashboard's plans page.
+   The pages chip goes amber past 80% used and red once nothing is left, so
+   running out is visible before a run is refused rather than only when one
+   fails. Both chips reuse the tables' status-chip styling. */
+.aiopdf-app .aiopdf-plan-bar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 10px;
+}
+
+/* An anchor wearing .btn: it goes somewhere, so middle-click and "open in new
+   tab" keep working, but it reads as the button it is. Sized down from .btn-sm
+   to sit level with the chips beside it rather than tower over them.
+
+   The selector carries the extra class deliberately. Both builds set a link
+   colour on `.aiopdf-app… a`, which is one element more specific than
+   `.btn-gradient` and would otherwise paint this button's label — and its crown,
+   drawn in currentColor — dark purple on a dark purple ground. */
+.aiopdf-app .aiopdf-plan-bar a.aiopdf-plan-upgrade,
+.aiopdf-app .aiopdf-plan-bar a.aiopdf-plan-upgrade:hover {
+  color: #fff;
+}
+.aiopdf-app .aiopdf-plan-upgrade {
+  padding: 6px 14px; font-size: 13.5px; gap: 7px; text-decoration: none; white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(66, 0, 131, 0.28);
+}
+
+/* The account dialog: two fields on a row, then the domain across the width. */
+.aiopdf-app .aiopdf-account-modal { width: 620px; max-width: 100%; }
+.aiopdf-app .aiopdf-field-hint {
+  font-size: 13px; font-weight: 600; color: var(--text-muted); line-height: 1.5;
+}
+.field, fieldset {
+    margin-block: 0px !important;
+}
